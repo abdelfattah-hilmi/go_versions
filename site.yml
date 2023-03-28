@@ -6,3 +6,6 @@
     - name: ansibleplaybook-simple
       debug:
         msg: this is working
+    - name : get-pkgs-names
+      ansible.builtin.shell:
+        cmd: apt list --installed > txt.txt 

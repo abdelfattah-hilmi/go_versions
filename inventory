@@ -1,0 +1,5 @@
+[VM]
+35.192.191.35
+
+[VM:vars]
+ansible_user=hilmiabdelfattah

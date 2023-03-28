@@ -2,10 +2,18 @@ package main
 
 import (
 	"context"
-	// "log"
+	"fmt"
+	"log"
 
-	"github.com/apenella/go-ansible/pkg/options"
-	"github.com/apenella/go-ansible/pkg/playbook"
+	m "example/go_versions/models"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+)
+
+var (
+	mongoURI = "mongodb://localhost:27017"
 )
 
 // type album struct {
@@ -38,24 +46,65 @@ import (
 
 func main() {
 
-	ansiblePlaybookConnectionOptions := &options.AnsibleConnectionOptions{
-		Connection: "local",
-	}
+	client, err := mongo.NewClient(options.Client().ApplyURI(mongoURI))
 
-	ansiblePlaybookOptions := &playbook.AnsiblePlaybookOptions{
-		Inventory: "35.192.191.35,",
+	if err != nil {
+		log.Fatal(err)
+		fmt.Println(err)
 	}
+	ctx := context.Background()
+	err = client.Connect(ctx)
 
-	playbook := &playbook.AnsiblePlaybookCmd{
-		Playbooks:         []string{"site.yml"},
-		ConnectionOptions: ansiblePlaybookConnectionOptions,
-		Options:           ansiblePlaybookOptions,
+	if err != nil {
+		log.Fatal(err)
+		fmt.Println(err)
+
 	}
+	defer client.Disconnect(ctx)
 
-	err := playbook.Run(context.TODO())
+	demodb := client.Database("test")
+
+	// err = demodb.CreateCollection(ctx, "packages")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// 	fmt.Println(err)
+	// }
+
+	pkgCollection := demodb.Collection("packages")
+	insertResult, err := pkgCollection.InsertOne(ctx, m.CollectedPackageInstance)
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println(insertResult.InsertedID)
+
+	var objects []m.CollectedPackage
+	cursor, err := pkgCollection.Find(ctx, bson.D{})
+	if err != nil {
+		panic(err)
+	}
+	if err = cursor.All(ctx, &objects); err != nil {
+		panic(err)
+	}
+	fmt.Println(objects)
+
+	// ansiblePlaybookConnectionOptions := &options.AnsibleConnectionOptions{
+	// 	Connection: "local",
+	// }
+
+	// ansiblePlaybookOptions := &playbook.AnsiblePlaybookOptions{
+	// 	Inventory: "./inventory,",
+	// }
+
+	// playbook := &playbook.AnsiblePlaybookCmd{
+	// 	Playbooks:         []string{"site.yml"},
+	// 	ConnectionOptions: ansiblePlaybookConnectionOptions,
+	// 	Options:           ansiblePlaybookOptions,
+	// }
+
+	// err := playbook.Run(context.TODO())
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	// router := gin.Default()
 	// router.GET("/albums", getAlbums)
