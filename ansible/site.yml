@@ -1,12 +1,33 @@
 ---
-
-- hosts: all
-
+- name: Run script and send data to backend 
+  hosts: all
+  become: true
+  
   tasks:
+
+    - name: update apt cache
+      apt:
+        update_cache: yes
+
+    - name: install pip3
+      apt:
+        name: python3-pip
+        state: present
+
+    - name: copy requirements.txt
+      copy:
+        src: ./requirements.txt
+        dest: ./requirements.txt
+
+    - name: install packages
+      pip:
+        requirements: /home/hilmiabdelfattah/requirements.txt
+
     - name: copy script
       copy:
         src: ./get-installed-pkgs.py
         dest: ./get-installed-pkgs.py 
+        
     - name : get-pkgs
       command: python3 ./get-installed-pkgs.py
 
