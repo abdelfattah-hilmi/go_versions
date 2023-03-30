@@ -79,5 +79,6 @@ if __name__== "__main__":
 
     print(vm_pkgs)
 
+    #TODO send vmpkgs to the backend  
     #TODO check if GIL is slowing the threads  
     

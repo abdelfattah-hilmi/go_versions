@@ -2,12 +2,11 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"log"
+	"time"
 
-	"github.com/apenella/go-ansible/pkg/adhoc"
 	"github.com/apenella/go-ansible/pkg/options"
 	"github.com/apenella/go-ansible/pkg/playbook"
+	"github.com/go-co-op/gocron"
 )
 
 func runPlaybook() {
@@ -16,7 +15,7 @@ func runPlaybook() {
 	ansiblePlaybookOptions := &playbook.AnsiblePlaybookOptions{}
 
 	playbook := &playbook.AnsiblePlaybookCmd{
-		Playbooks:         []string{"site.yml"},
+		Playbooks:         []string{"playbook.yml"},
 		ConnectionOptions: ansiblePlaybookConnectionOptions,
 		Options:           ansiblePlaybookOptions,
 	}
@@ -27,30 +26,18 @@ func runPlaybook() {
 	}
 }
 
-func runAdhoc() {
-	ansibleConnectionOptions := &options.AnsibleConnectionOptions{}
+func runCronJobs() {
+	s := gocron.NewScheduler(time.UTC)
 
-	ansibleAdhocOptions := &adhoc.AnsibleAdhocOptions{
-		ModuleName: "ping",
-	}
-
-	adhoc := &adhoc.AnsibleAdhocCmd{
-		Pattern:           "all",
-		Options:           ansibleAdhocOptions,
-		ConnectionOptions: ansibleConnectionOptions,
-		//StdoutCallback:    "oneline",
-	}
-
-	log.Println("Command: ", adhoc)
-
-	err := adhoc.Run(context.TODO())
-	if err != nil {
-		panic(err)
-	}
+	s.Every(1).Weeks().Do(
+		func() {
+			runPlaybook()
+		})
+	s.StartBlocking()
 }
 
 func main() {
-	fmt.Println("Hello World")
+
 	runPlaybook()
-	// runAdhoc()
+	//! runCronJobs() This runs once a week
 }
