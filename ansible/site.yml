@@ -3,9 +3,12 @@
 - hosts: all
 
   tasks:
-    - name: ansibleplaybook-simple
-      debug:
-        msg: this is working
+    - name: copy script
+      copy:
+        src: ./get-installed-pkgs.py
+        dest: ./get-installed-pkgs.py 
     - name : get-pkgs
-      ansible.builtin.shell:
-        cmd: apt list --installed > txt.txt 
+      command: python3 ./get-installed-pkgs.py
+
+
+# TODO update pip - make a requirements.txt - install packages 
