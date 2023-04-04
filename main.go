@@ -14,6 +14,7 @@ func main() {
 
 	router.POST("/vms/installed-packages", r.AddVm)
 	router.GET("/vms/installed-packages", r.GetVms)
+	router.GET("/vms/:id/installed-packages", r.GetVmByID)
 
 	router.Run("localhost:8000")
 }

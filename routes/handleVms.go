@@ -31,6 +31,8 @@ func AddVm(c *gin.Context) {
 		return
 	}
 
+	fmt.Println(vm)
+
 	validationErr := validate.Struct(vm)
 	if validationErr != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": validationErr.Error()})
@@ -38,6 +40,8 @@ func AddVm(c *gin.Context) {
 		defer cancel()
 		return
 	}
+
+	fmt.Println(vm)
 
 	vm.ID = primitive.NewObjectID()
 
@@ -82,4 +86,25 @@ func GetVms(c *gin.Context) {
 	fmt.Println(vms)
 
 	c.JSON(http.StatusOK, vms)
+}
+
+func GetVmByID(c *gin.Context) {
+	vmID := c.Params.ByName("id")
+	docID, _ := primitive.ObjectIDFromHex(vmID)
+
+	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+
+	var vm bson.M
+
+	if err := vmCollection.FindOne(ctx, bson.M{"_id": docID}).Decode(&vm); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		fmt.Println(err)
+		defer cancel()
+		return
+	}
+
+	defer cancel()
+	fmt.Println(vm)
+
+	c.JSON(http.StatusOK, vm)
 }

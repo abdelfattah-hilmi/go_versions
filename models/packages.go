@@ -4,20 +4,20 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 
 type InstalledPackage struct {
 	ID               primitive.ObjectID `bson:"_id,omitempty"`
-	PackageName      string             `bson:"package-name,omitempty"`
-	InstalledVersion string             `bson:"installed-version,omitempty"`
-	CandidateVersion string             `bson:"title,omitempty"`
+	PackageName      string             `bson:"package-name,omitempty" json:"package-name" binding:"required"`
+	InstalledVersion string             `bson:"installed-version,omitempty" json:"installed-version" binding:"required"`
+	CandidateVersion string             `bson:"candidate-version,omitempty" json:"candidate-version" binding:"required"`
 }
 
 type CollectedPackage struct {
 	ID                     primitive.ObjectID `bson:"_id,omitempty"`
-	PackageName            string             `bson:"package-name,omitempty"`
-	InstalledVersion       string             `bson:"installes-version,omitempty"`
-	CandidateVersion       string             `bson:"candidate-version,omitempty"`
-	InstalledVersionStatus string             `bson:"installed-version-status,omitempty"`
-	InstalledVersionCves   []string           `bson:"installed-version-cves,omitempty"`
-	LatestVersion          string             `bson:"latest-version,omitempty"`
-	LatestReleaseNotes     []string           `bson:"latest-release-notes,omitempty"`
+	PackageName            string             `bson:"package-name,omitempty" json:"package-name" binding:"required"`
+	InstalledVersion       string             `bson:"installed-version,omitempty" json:"installed-version" binding:"required"`
+	CandidateVersion       string             `bson:"candidate-version,omitempty" json:"candidate-version" binding:"required"`
+	InstalledVersionStatus string             `bson:"installed-version-status,omitempty" json:"installes-version-status" binding:"required"`
+	InstalledVersionCves   []string           `bson:"installed-version-cves,omitempty" json:"installed-version-cves" binding:"required"`
+	LatestVersion          string             `bson:"latest-version,omitempty" json:"latest-version" binding:"required"`
+	LatestReleaseNotes     []string           `bson:"latest-release-notes,omitempty" json:"latest-release-notes" binding:"required" `
 }
 
 var cves = []string{"cve", "cve"}
