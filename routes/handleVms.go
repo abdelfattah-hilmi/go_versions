@@ -18,6 +18,7 @@ var validate = validator.New()
 
 var vmCollection *mongo.Collection = OpenCollection(Client, "vms")
 
+// Insert VM into collectio
 func AddVm(c *gin.Context) {
 
 	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
@@ -41,10 +42,13 @@ func AddVm(c *gin.Context) {
 		return
 	}
 
-	fmt.Println(vm)
-
 	vm.ID = primitive.NewObjectID()
 
+	// collection
+	pkg := vm.InstalledPackages[0].PackageName
+	vm.InstalledPackages[0].LatestReleaseNotes = getReleaseNotes(pkg)
+
+	// ---------------
 	result, insertErr := vmCollection.InsertOne(ctx, vm)
 
 	if insertErr != nil {
@@ -58,6 +62,10 @@ func AddVm(c *gin.Context) {
 
 	c.JSON(http.StatusOK, result)
 
+}
+
+func getReleaseNotes(pkg string) {
+	panic("unimplemented")
 }
 
 // get all vms
@@ -83,7 +91,6 @@ func GetVms(c *gin.Context) {
 		return
 	}
 	defer cancel()
-	fmt.Println(vms)
 
 	c.JSON(http.StatusOK, vms)
 }

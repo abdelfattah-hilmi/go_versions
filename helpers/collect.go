@@ -1,4 +1,4 @@
-package main
+package helpers
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"github.com/gocolly/colly"
 )
 
-func getReleaseNotes(pkg string) {
+func getReleaseNotes(pkg string) string {
 	var base_url = "https://www.wikidata.org"
 	var url = base_url + "/w/index.php?search=" + pkg
 
@@ -23,11 +23,14 @@ func getReleaseNotes(pkg string) {
 	fmt.Println(id)
 
 	url = base_url + id
+
+	link := []string{}
+
 	c.OnHTML("#P348 .wb-preferred .external", func(h *colly.HTMLElement) {
-		fmt.Println(h.Text)
+		link = append(link, h.Text)
 	})
 	c.Visit(url)
-
+	return link[0]
 }
 
 func getRepologyData(pkg string) {
@@ -79,13 +82,4 @@ func pkgIsinUbnutuData(distro_name string, pkg string) bool {
 		fmt.Println(true)
 		return true
 	}
-}
-
-func main() {
-
-	// pkg := "redis"
-
-	// getRepologyData(pkg)
-	// getReleaseNotes(pkg)
-	pkgIsinUbnutuData("bionic", "wogerman")
 }
