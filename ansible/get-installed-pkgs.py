@@ -41,7 +41,7 @@ def get_package_data(pkg,vm):
     package_info = {
                         "package-name": pkg,
                         "installed-version": installed_version,
-                        "condidate-version": candidate_version,
+                        "candidate-version": candidate_version,
                     }
     vm["installed-packages"].append(package_info)
 

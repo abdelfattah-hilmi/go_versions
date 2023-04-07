@@ -3,10 +3,10 @@ package models
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
 type InstalledPackage struct {
-	ID               primitive.ObjectID `bson:"_id,omitempty"`
-	PackageName      string             `bson:"package-name,omitempty" json:"package-name" binding:"required"`
-	InstalledVersion string             `bson:"installed-version,omitempty" json:"installed-version" binding:"required"`
-	CandidateVersion string             `bson:"candidate-version,omitempty" json:"candidate-version" binding:"required"`
+	// ID               primitive.ObjectID `bson:"_id,omitempty"`
+	PackageName      string `bson:"package-name,omitempty" json:"package-name" binding:"required"`
+	InstalledVersion string `bson:"installed-version,omitempty" json:"installed-version" binding:"required"`
+	CandidateVersion string `bson:"candidate-version,omitempty" json:"candidate-version" binding:"required"`
 }
 
 type CollectedPackage struct {

@@ -108,3 +108,23 @@ func GetVmByID(c *gin.Context) {
 
 	c.JSON(http.StatusOK, vm)
 }
+
+func DeleteVm(c *gin.Context) {
+	vmID := c.Params.ByName("id")
+	docID, _ := primitive.ObjectIDFromHex(vmID)
+
+	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+
+	result, err := vmCollection.DeleteOne(ctx, bson.M{"_id": docID})
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		defer cancel()
+		return
+	}
+
+	defer cancel()
+
+	c.JSON(http.StatusOK, result.DeletedCount)
+
+}
