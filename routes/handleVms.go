@@ -2,7 +2,9 @@ package routes
 
 import (
 	"context"
+	"example/go_versions/helpers"
 	"example/go_versions/models"
+
 	"fmt"
 	"net/http"
 	"time"
@@ -32,8 +34,6 @@ func AddVm(c *gin.Context) {
 		return
 	}
 
-	fmt.Println(vm)
-
 	validationErr := validate.Struct(vm)
 	if validationErr != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": validationErr.Error()})
@@ -45,8 +45,15 @@ func AddVm(c *gin.Context) {
 	vm.ID = primitive.NewObjectID()
 
 	// collection
-	pkg := vm.InstalledPackages[0].PackageName
-	vm.InstalledPackages[0].LatestReleaseNotes = getReleaseNotes(pkg)
+	for i := 0; i < len(vm.InstalledPackages); i++ {
+
+		pkg_name := vm.InstalledPackages[i].PackageName
+		vm.InstalledPackages[i].LatestReleaseNotes = helpers.GetReleaseNotes(pkg_name)
+		repo := helpers.GetRepologyData(pkg_name)
+		vm.InstalledPackages[i].LatestVersion = repo.LatestVersion
+		vm.InstalledPackages[i].Cves = repo.Cves
+
+	}
 
 	// ---------------
 	result, insertErr := vmCollection.InsertOne(ctx, vm)
@@ -62,10 +69,6 @@ func AddVm(c *gin.Context) {
 
 	c.JSON(http.StatusOK, result)
 
-}
-
-func getReleaseNotes(pkg string) {
-	panic("unimplemented")
 }
 
 // get all vms
@@ -114,6 +117,56 @@ func GetVmByID(c *gin.Context) {
 	fmt.Println(vm)
 
 	c.JSON(http.StatusOK, vm)
+}
+
+func GetVmByIP(c *gin.Context) {
+	vmIP := c.Params.ByName("ip")
+	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+
+	var vms []bson.M
+
+	cursor, err := vmCollection.Find(ctx, bson.M{"ip": vmIP})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		fmt.Println(err)
+		defer cancel()
+		return
+	}
+	if err = cursor.All(ctx, &vms); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		fmt.Println(err)
+		defer cancel()
+		return
+	}
+	defer cancel()
+	c.JSON(http.StatusOK, vms)
+}
+
+func GetPackages(c *gin.Context) {
+	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+
+	// var vms []bson.M
+	var vms []interface{}
+
+	cursor, err := vmCollection.Find(ctx, bson.M{})
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		fmt.Println(err)
+		defer cancel()
+		return
+	}
+
+	if err = cursor.All(ctx, &vms); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		fmt.Println(err)
+		defer cancel()
+		return
+	}
+
+	defer cancel()
+	// get packages from vms
+	// var pkg map[string]interface{}
 }
 
 func DeleteVm(c *gin.Context) {

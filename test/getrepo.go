@@ -1,4 +1,4 @@
-package helpers
+package main
 
 import (
 	"example/go_versions/models"
@@ -7,37 +7,11 @@ import (
 	"github.com/gocolly/colly"
 )
 
-func GetReleaseNotes(pkg string) []string {
-	var base_url = "https://www.wikidata.org"
-	var url = base_url + "/w/index.php?search=" + pkg
-
-	c := colly.NewCollector()
-
-	ids := []string{}
-
-	c.OnHTML("ul.mw-search-results", func(h *colly.HTMLElement) {
-		ids = append(ids, h.ChildAttr("li div a", "href"))
-	})
-	c.Visit(url)
-
-	id := ids[0]
-
-	url = base_url + id
-
-	Link := []string{}
-
-	c.OnHTML("#P348 .wb-preferred .external", func(h *colly.HTMLElement) {
-		Link = append(Link, h.Text)
-	})
-	c.Visit(url)
-
-	return Link
-}
-
 func GetRepologyData(pkg string) models.Repology {
 
 	repo := models.Repology{}
 	cve := models.Cve{}
+
 	c := colly.NewCollector()
 
 	var url = "https://repology.org/project/" + pkg + "/information"
@@ -67,25 +41,10 @@ func GetRepologyData(pkg string) models.Repology {
 	})
 	c.Visit(url)
 
+	fmt.Println(repo.Cves)
 	return repo
 }
 
-func PkgIsinUbnutuData(distro_name string, pkg string) bool {
-	url := "https://packages.ubuntu.com/" + distro_name + "/" + pkg
-
-	c := colly.NewCollector()
-
-	value := []string{}
-	c.OnHTML("#content h1", func(h *colly.HTMLElement) {
-		value = append(value, h.Text)
-	})
-
-	c.Visit(url)
-	if value[0] == "Error" {
-		fmt.Println(false)
-		return false
-	} else {
-		fmt.Println(true)
-		return true
-	}
+func main() {
+	GetRepologyData("nginx")
 }
