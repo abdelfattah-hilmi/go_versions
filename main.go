@@ -14,12 +14,12 @@ func main() {
 	// defining endpoints
 	router.Use(cors.Default())
 
-	router.POST("/vms/installed-packages", r.AddVm)
-	router.GET("/vms/installed-packages", r.GetVms)
-	router.GET("/vms/:id/installed-packages", r.GetVmByID)
-	router.GET("/vm/:ip", r.GetVmByIP)
-	router.GET("/packages", r.GetPackages)
-	router.DELETE("/vms/:id/installed-packages", r.DeleteVm)
+	router.POST("/api/vms/installed-packages", r.AddVm)
+	router.GET("/api/vms/installed-packages", r.GetVms)
+	router.GET("/api/vms/:id/installed-packages", r.GetVmByID)
+	router.GET("/api/vm/:ip", r.GetVmByIP)
+	router.GET("/api/packages", r.GetPackages)
+	router.DELETE("/api/vms/:id/installed-packages", r.DeleteVm)
 
 	router.Run("0.0.0.0:8000")
 }
